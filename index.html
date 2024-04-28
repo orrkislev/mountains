@@ -5,7 +5,7 @@
     //---- do not edit the following code (you can indent as you wish)
     let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
     var fxhash = "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
-    // fxhash = "oo1gNk3Dvumw7mQH15vBqRuvdtKtEgVS6gBJ4DcxqyHoCdVy944"
+    // fxhash = "ooVRN1PyBeXw8J6jxs5rq7HULyHDbxeV2n9R7kD66fjBDyGRKFe"
     let b58dec = str=>[...str].reduce((p,c)=>p*alphabet.length+alphabet.indexOf(c)|0, 0)
     let fxhashTrunc = fxhash.slice(2)
     let regex = new RegExp(".{" + ((fxhashTrunc.length/4)|0) + "}", 'g')

@@ -9,7 +9,7 @@ function createHeightMap2() {
     shaderGraphics.pixelDensity(1)
 
     for (let i = 0; i < 1000; i++) {
-        const r = random(500, 1500)
+        const r = random(100, 1500)
         const x = random(r, mapX - r)
         const y = random(r, mapY - r)
         if (!circles.some(c => p(x, y).getDistance(p(c.x, c.y)) < c.r / 2 + r / 2)) {
@@ -48,14 +48,14 @@ const getFrag = () => {
         vec2 pos = vTexCoord;
         ${withDisplacement ? `
             float ns_xl = ${random().toFixed(2)};
-            float ns_sm = ${random(2, 4).toFixed(2)};
+            float ns_sm = ${random(2).toFixed(2)};
 
             float a = noise2d(vTexCoord * ns_xl) * PI * 2.0 * 2.0;
             float r = (noise2d(vTexCoord * ns_xl + 1000.0) - .5) * ${random().toFixed(2)};
             vec2 offset = vec2(cos(a), sin(a)) * r;
 
-            a = noise2d(vTexCoord * ns_sm) * PI * 2.0 * 2.0;
-            r = (noise2d(vTexCoord * ns_sm + 1000.0) - .5) * ${random(.02, .1).toFixed(2)};
+            a = noise2d(vTexCoord * ns_sm) * PI * 2.0 * 3.0;
+            r = (noise2d(vTexCoord * ns_sm + 1000.0) - .5) * .1;
             offset += vec2(cos(a), sin(a)) * r;
 
             pos += offset;
@@ -80,10 +80,10 @@ const getFrag = () => {
         // v = 0.0;
         ${circles.map((c, i) => `
             {
-                vec2 circlePos = vec2(${c.x / mapX}, ${c.y / mapY});
-                float dist = length(circlePos - vTexCoord);
+                // vec2 circlePos = vec2(${c.x / mapX}, ${c.y / mapY});
+                // float dist = length(circlePos - vTexCoord);
                 // v = csmap(dist, 0.0, ${c.r / mapX}, ${random()}, v);
-                v = csmap(dist, 0.0, ${(c.r / mapX)}, 0.0, v);
+                // v = csmap(dist, 0.0, ${(c.r / mapX)}, 0.0, v);
                 // v = max(v, 1.0 - smootherstep(0.0, ${(c.r / mapX) * .2}, dist));
                 // v = max(v, 1.0 - smootherstep(0.0, .5, dist));
             }

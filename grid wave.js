@@ -14,7 +14,7 @@ withNormalLight = random() > .5
 lerpVal = .1
 
 palletes = [
-    [255, 0], ['#f5f5e1', '#32321e'], ['orange', 'darkblue']
+    [255, 0], ['#f5f5e1', '#32321e'], ['orange', 'darkblue'], 'special'
 ]
 
 async function setup() {
@@ -25,12 +25,21 @@ async function setup() {
     noFill()
 
     const pallete = choose(palletes)
-    lightClr = color(pallete[0])
-    shadowClr = color(pallete[1])
-
+    if (pallete == 'special') {
+        colorMode(HSB, 360, 100, 100, 100)
+        hue = random(3600) % 360
+        lightClr = color(hue, 100, 80)
+        shadowClr = color((hue + 225) % 360, 100, 40)
+        // lightClr2 = color(hue, 80, 100)
+        // shadowClr2 = color((hue + 225) % 360, 80, 20)
+    } else {
+        lightClr = color(pallete[0])
+        shadowClr = color(pallete[1])
+    }
+    
     lightClr2 = color(255)
     shadowClr2 = color(0)
-    bgColor = choose([shadowClr2, lightClr2])
+    bgColor = choose([0, 255])
 
     heightScale = height * 0.28
     y_scl = random(.3, 1)
@@ -175,11 +184,11 @@ class HeightObject {
                     nextValue = lerp(nextValue, -.9, lerpVal)
                     nextLights[x] = lastLight - shadowScale
                 }
-                
+
                 let clr = lightShadowTechnique(nextValue, h)
                 nextValues[x] = nextValue
 
-                if (withNormalLight){
+                if (withNormalLight) {
                     const n = this.getHeightNormal(x / dataSize[0], y / dataSize[1])
                     const d = p5.Vector.dot(n, createVector(-1, .2, .4).normalize())
                     clr = normalLightTechnique(clr, d)
@@ -234,18 +243,18 @@ const csmap = (v, a, b, c, d) => {
 
 
 lightShadowTechniques = [
-    (v,h) => {
+    (v, h) => {
         if (v > 0) return lerpColor(lightClr, lightClr2, v)
         else return lerpColor(shadowClr, shadowClr2, -v)
     },
-    (v,h) => lerpColor(shadowClr, lightClr, (v+1) / 2),
-    (v,h) => (v > 0) ? lightClr : shadowClr,
+    (v, h) => lerpColor(shadowClr, lightClr, (v + 1) / 2),
+    (v, h) => (v > 0) ? lightClr : shadowClr,
 ]
 
 normalLightTechniques = [
-    (clr,d) => d ** 12 > .3 ? lightClr2 : clr,
-    (clr,d) => d ** 12 > .3 ? color(255) : color(0),
-    (clr,d) => (abs((d*10)%1)<.5) ? lerpColor(clr, lightClr2, d * 2) : clr,
-    (clr,d) => (abs((d*10)%1)<.5) ? lerpColor(clr, color(255), d * 2) : color(0)
+    (clr, d) => d ** 12 > .3 ? lightClr2 : clr,
+    (clr, d) => d ** 12 > .3 ? color(255) : color(0),
+    (clr, d) => (abs((d * 10) % 1) < .5) ? lerpColor(clr, lightClr2, d * 2) : clr,
+    (clr, d) => (abs((d * 10) % 1) < .5) ? lerpColor(clr, color(255), d * 2) : color(0)
 ]
 
