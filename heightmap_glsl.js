@@ -1,7 +1,7 @@
 let circles = []
 
 const withSmallNoise = random() < .5
-const withDisplacement = random() < .8
+const withDisplacement = random() < .85
 const withBowl = random() < .5
 
 function createHeightMap2() {
@@ -71,23 +71,20 @@ const getFrag = () => {
 
         ${choose(hillsWays)}
 
-        
-        // v = abs(sin(d * 6.0 * PI * 2.0)) / 2.0 - v / 3.0;
-        // v = cmap(d, 0.0, 1.0, v, 0.0);
-
-        ${withBowl ? `v = cmap(d2, 0.3, .5, v, ${random() ** 2 * .5});` : ''}
-
         // v = 0.0;
         ${circles.map((c, i) => `
             {
-                // vec2 circlePos = vec2(${c.x / mapX}, ${c.y / mapY});
-                // float dist = length(circlePos - vTexCoord);
-                // v = csmap(dist, 0.0, ${c.r / mapX}, ${random()}, v);
-                // v = csmap(dist, 0.0, ${(c.r / mapX)}, 0.0, v);
+                vec2 circlePos = vec2(${c.x / mapX}, ${c.y / mapY});
+                float dist = length(circlePos - vTexCoord);
+                v = csmap(dist, 0.0, ${c.r / mapX}, ${random()}, v);
+                v = csmap(dist, 0.0, ${(c.r / mapX) * .7}, 0.0, v);
                 // v = max(v, 1.0 - smootherstep(0.0, ${(c.r / mapX) * .2}, dist));
                 // v = max(v, 1.0 - smootherstep(0.0, .5, dist));
             }
         `).join('')}
+
+        ${withBowl ? `v = cmap(d2, 0.3, .5, v, ${random() ** 2 * .5});` : ''}
+
 
         v *= 4.0;
         vec4 clr = applyHeight(v);
@@ -95,6 +92,7 @@ const getFrag = () => {
     }    
     `
 }
+
 
 
 
@@ -134,5 +132,5 @@ const hillsWays = [
     `v = csmap(d, 0.0, 0.5, 1.0, v);
      v = csmap(d, 0.0, 0.1, 0.0, v);`,
     `v = csmap(d,0.0,0.5,(sin(d * 3.0 * PI * 2.0) + 1.0) / 2.0,v);`,
-    `v = (sin(d * 5.0 * PI * 2.0) + 1.0) / 2.0;`
+    `v = (sin(d * 5.0 * PI * 2.0) + 1.0) / 4.0;`
 ]

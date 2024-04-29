@@ -32,18 +32,19 @@ async function setup() {
         shadowClr = color((hue + 225) % 360, 100, 40)
         // lightClr2 = color(hue, 80, 100)
         // shadowClr2 = color((hue + 225) % 360, 80, 20)
+        lightShadowTechniques.pop()
     } else {
         lightClr = color(pallete[0])
         shadowClr = color(pallete[1])
     }
-    
+
     lightClr2 = color(255)
     shadowClr2 = color(0)
     bgColor = choose([0, 255])
 
     heightScale = height * 0.28
     y_scl = random(.3, 1)
-    y_offset = random()
+    y_offset = random(-.3, 1)
 
     lightShadowTechnique = choose(lightShadowTechniques)
     normalLightTechnique = choose(normalLightTechniques)
@@ -117,8 +118,8 @@ class HeightObject {
 
     getPos(pos, h) {
         if (h === undefined) h = this.getHeight(pos.x, pos.y)
-        return this.getFlatPos(pos.x, pos.y).add(p(0, -h))
-        // return this.getFlatPos(pos.x, pos.y).add(this.getNormal(pos.x, pos.y).multiply(h))
+        // return this.getFlatPos(pos.x, pos.y).add(p(0, -h))
+        return this.getFlatPos(pos.x, pos.y).add(this.getNormal(pos.x, pos.y).multiply(h))
     }
 
     async drawStuff() {
@@ -201,10 +202,10 @@ class HeightObject {
                 lastPositions[x] = pixelPos
 
 
-                if (cropCircle && abs(p(x / dataSize[0], y / dataSize[1]).getDistance(p(0.5, 0.5)) - .5) < 0.001) {
+                // if (cropCircle && abs(p(x / dataSize[0], y / dataSize[1]).getDistance(p(0.5, 0.5)) - .5) < 0.001) {
                     stroke(bgColor)
-                    line(pixelPos.x, pixelPos.y, pixelPos.x, pixelPos.y + height)
-                }
+                    line(pixelPos.x, pixelPos.y+1, pixelPos.x, pixelPos.y + height)
+                // }
 
             }
 
@@ -243,12 +244,12 @@ const csmap = (v, a, b, c, d) => {
 
 
 lightShadowTechniques = [
+    (v, h) => (v > 0) ? lightClr : shadowClr,
     (v, h) => {
         if (v > 0) return lerpColor(lightClr, lightClr2, v)
         else return lerpColor(shadowClr, shadowClr2, -v)
     },
     (v, h) => lerpColor(shadowClr, lightClr, (v + 1) / 2),
-    (v, h) => (v > 0) ? lightClr : shadowClr,
 ]
 
 normalLightTechniques = [
