@@ -3,17 +3,20 @@ let circles = []
 const withSmallNoise = random() < .5
 const withDisplacement = random() < .85
 const withBowl = random() < .5
+const useCircles = random() < .7
 
 function createHeightMap2() {
     const shaderGraphics = createGraphics(mapX, mapY, WEBGL)
     shaderGraphics.pixelDensity(1)
 
-    for (let i = 0; i < 1000; i++) {
-        const r = random(100, 1500)
-        const x = random(r, mapX - r)
-        const y = random(r, mapY - r)
-        if (!circles.some(c => p(x, y).getDistance(p(c.x, c.y)) < c.r / 2 + r / 2)) {
-            circles.push({ x, y, r })
+    if (useCircles) {
+        for (let i = 0; i < 1000; i++) {
+            const r = random(100, 1500)
+            const x = random(r, mapX - r)
+            const y = random(r, mapY - r)
+            if (!circles.some(c => p(x, y).getDistance(p(c.x, c.y)) < c.r / 2 + r / 2)) {
+                circles.push({ x, y, r })
+            }
         }
     }
 
@@ -131,6 +134,6 @@ const smallNoise = [
 const hillsWays = [
     `v = csmap(d, 0.0, 0.5, 1.0, v);
      v = csmap(d, 0.0, 0.1, 0.0, v);`,
-    `v = csmap(d,0.0,0.5,(sin(d * 3.0 * PI * 2.0) + 1.0) / 2.0,v);`,
+    `v = csmap(d,0.0,0.5,(sin(d * 3.0 * PI * 2.0) + 1.0) / 3.0,v);`,
     `v = (sin(d * 5.0 * PI * 2.0) + 1.0) / 4.0;`
 ]

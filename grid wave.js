@@ -14,7 +14,8 @@ withNormalLight = random() > .5
 lerpVal = .1
 
 palletes = [
-    [255, 0], ['#f5f5e1', '#32321e'], ['orange', 'darkblue'], 'special'
+    [255, 0],[255, 0],[255, 0],[255, 0],
+    ['#f5f5e1', '#32321e'], ['orange', 'darkblue'], 'special'
 ]
 
 async function setup() {
@@ -118,7 +119,7 @@ class HeightObject {
 
     getPos(pos, h) {
         if (h === undefined) h = this.getHeight(pos.x, pos.y)
-        // return this.getFlatPos(pos.x, pos.y).add(p(0, -h))
+        if (abs(y_offset) < .2) return this.getFlatPos(pos.x, pos.y).add(p(0, -h))
         return this.getFlatPos(pos.x, pos.y).add(this.getNormal(pos.x, pos.y).multiply(h))
     }
 
