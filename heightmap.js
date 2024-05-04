@@ -1,27 +1,30 @@
 mapX = 3500
 mapY = 3500
 
-const ns_xl = mapX * .88
-const ns_sm = mapX * .3
-function getSwirlPosition(x, y) {
-    let a = noise(x / ns_xl, y / ns_xl) * 360 * 3
-    let r = (noise(x / ns_xl, y / ns_xl) - .5) * mapX
-    let offsetX = Math.floor(cos(a) * r)
-    let offsetY = Math.floor(sin(a) * r)
+const ns_xl = random()
+const ns_xl_scl = random(.5, 1.5)
+const ns_sm = random()
 
-    a = noise(y / ns_sm, x / ns_sm) * 360 * 6
-    r = (noise(y / ns_sm, x / ns_sm) - .5) * mapX * .2
-    offsetX += Math.floor(cos(a) * r)
-    offsetY += Math.floor(sin(a) * r)
+function getSwirlPosition(x, y) {
+    let a = noise(x * ns_xl, y * ns_xl) * 360 * 2
+    let r = (noise(x * ns_xl, y * ns_xl) - .5) * ns_xl_scl
+    let offsetX = cos(a) * r
+    let offsetY = sin(a) * r
+
+    a = noise(y * ns_sm, x * ns_sm) * 360 * 1
+    r = (noise(y * ns_sm, x * ns_sm) - .5) * .05
+    offsetX += cos(a) * r
+    offsetY += sin(a) * r
     return [x + offsetX, y + offsetY]
 }
 
 function applyTerrain(heightMap) {
+    noiseDetail(5, .5)
     heightMap.loadPixels()
     for (let x = 0; x < mapX; x++) {
         for (let y = 0; y < mapY; y++) {
-            const [swirlX, swirlY] = getSwirlPosition(x, y)
-            const v = getTerrain(swirlX / mapX, swirlY / mapY) * 4
+            const [swirlX, swirlY] = getSwirlPosition(x/ mapX, y / mapY)
+            const v = getTerrain(swirlX, swirlY) * 3
             const i = (x + y * mapX) * 4
             for (j = 0; j < floor(v); j++) {
                 heightMap.pixels[i + j] = 255
@@ -29,19 +32,20 @@ function applyTerrain(heightMap) {
             heightMap.pixels[i + j] = 255 * (v - floor(v))
         }
     }
-    // heightMap.updatePixels()
+    heightMap.updatePixels()
 }
 
 function getTerrain(x, y) {
     const relPos = p(x, y).subtract(p(0.5, 0.5))
 
     let v = noise(x * 4, y * 8) ** 4 * .4 + noise(x * 80, y * 80) ** 3 * .05
+    // let v = 0
     // v = noise(x * 15, y * 2) * .4
     // v += noise(x * 100, y * 100) * .02
     // v += noise(x * 6, y * 6) ** 2 * .1
 
-    v = csmap(relPos.length, .0, .5, 1, v)
-    v = csmap(relPos.length, 0.0, 0.1, 0, v)
+    // v = csmap(relPos.length, .0, .5, 1, v)
+    // v = csmap(relPos.length, 0.0, 0.1, 0, v)
     // v = csmap(relPos.length, .4, .5, v, 0)
 
     // v = csmap(relPos.length, .4, .45, v, v+.1)
@@ -73,9 +77,11 @@ function createHeightMap(m) {
     //     const y = random(r,mapY-r)
     //     if (!circles.some(c => p(x, y).getDistance(p(c.x, c.y)) < c.r + r)) {
     //         circles.push({ x, y, r })
-    //         heightMap.fill(random(100, 150))
+    //         fillColor(heightMap, random(1000))
+    //         // heightMap.fill(random(100, 150))
     //         heightMap.circle(x, y, r * 1.6 - 30)
-    //         heightMap.fill(0,0,255)
+    //         // heightMap.fill(0,0,255)
+    //         fillColor(heightMap, 0)
     //         heightMap.circle(x, y, r - 30)
     //     }
     // }
@@ -87,22 +93,22 @@ function createHeightMap(m) {
     // heightMap.line(-400, 0, 400, 0)
     // heightMap.line(0, -400, 0, 400)
 
-    // heightMap.drawingContext.filter = `blur(600px)`
-    // heightMap.fill(255, 0, 0)
-    // heightMap.circle(mapX / 2, mapY / 2, 3000)
-    // heightMap.drawingContext.filter = `blur(10px)`
-    // heightMap.fill(0,0,255)
-    // heightMap.circle(mapX / 2, mapY / 2, 400)
+    heightMap.drawingContext.filter = `blur(600px)`
+    fillColor(heightMap, 1000)
+    heightMap.circle(mapX / 2, mapY / 2, mapX / 3)
+    heightMap.drawingContext.filter = `blur(10px)`
+    fillColor(heightMap, 0)
+    heightMap.circle(mapX / 2, mapY / 2, mapX / 10)
 
-    // let v = createVector(mapX / 2,0)
+    // let v = createVector(mapX / 2, 0)
     // heightMap.translate(mapX / 2, mapY / 2)
     // heightMap.drawingContext.filter = `blur(20px)`
     // for (let i = 0; i < mapX / 2; i++) {
-    //     heightMap.fill(csmap(i, 0, mapX / 2, 0, 255))
+    //     fillColor(heightMap,csmap(i, 0, mapX / 2, 0, 1000))
     //     heightMap.circle(v.x, v.y, map(i, 0, mapX / 2, 200, 40))
     //     v.rotate(3)
     //     if (i % 36 == 0) v.rotate(2)
-    //     v.setMag(csmap(i, 0, mapX / 2, mapX/2, 0))
+    //     v.setMag(csmap(i, 0, mapX / 2, mapX / 2, 0))
     // }
 
 
@@ -122,7 +128,7 @@ function createHeightMap(m) {
 
     // applyNoiseSwirl(heightMap)
 
-    // heightMap.loadPixels()
+    heightMap.loadPixels()
     // push()
     // resetMatrix()
     // image(heightMap, 0, 0,width,height)
@@ -154,4 +160,12 @@ function applyNoiseSwirl(heightMap) {
         }
     }
     heightMap.updatePixels()
+}
+
+const fillColor = (heightMap,v) => {
+    v = map(v,0,1000,0,765)
+    const r = constrain(v, 0, 255)
+    const g = constrain(v - 255, 0, 255)
+    const b = constrain(v - 255 * 2, 0, 255)
+    heightMap.fill(r, g, b, 255)
 }

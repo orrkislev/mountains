@@ -1,9 +1,11 @@
 let circles = []
 
 const withSmallNoise = random() < .5
-const withDisplacement = random() < .85
+const withDisplacement = random() < .5
 const withBowl = random() < .5
 const useCircles = random() < .7
+const withManMade = random() < .5
+const withHill = true
 
 function createHeightMap2() {
     const shaderGraphics = createGraphics(mapX, mapY, WEBGL)
@@ -25,9 +27,42 @@ function createHeightMap2() {
     shdr.setUniform('mapRes', [mapX, mapY])
     shdr.setUniform('noiseOffset', [random(1000), random(1000)])
     shaderGraphics.rect(0, 0, mapX, mapY)
+
+    if (withManMade) {
+        const shdr2 = shaderGraphics.createShader(BasicVertexShader, manmadeFrag)
+        shaderGraphics.shader(shdr2)
+        shdr2.setUniform('mapRes', [mapX, mapY])
+        shdr2.setUniform('tex0', shaderGraphics)
+        shaderGraphics.rect(0, 0, mapX, mapY)
+    }
+
     shaderGraphics.loadPixels()
+
     return shaderGraphics
 }
+
+const manmadeFrag = `
+precision highp float;
+varying vec2 vTexCoord;
+uniform vec2 mapRes;
+uniform sampler2D tex0;
+
+${lerpStuff}
+
+void main(){
+    vec2 pixelPos = vTexCoord * mapRes;
+    vec2 center = mapRes * vec2(.5);
+    vec2 dir = pixelPos - center;
+    float dist = length(dir);
+    float angle = atan(dir.y, dir.x);
+    float angleOffset = csmap(dist, 0.0, 1000.0, 3.14, 0.0);
+    angle += angleOffset;
+
+    vec2 newPixelPos = center + vec2(cos(angle), sin(angle)) * dist;
+    vec2 newTexCoord = newPixelPos / mapRes;
+    gl_FragColor = texture2D(tex0, newTexCoord);
+}
+`
 
 const getFrag = () => {
     return `
@@ -72,7 +107,7 @@ const getFrag = () => {
         ${choose(noiseWays)}
         ${withSmallNoise ? choose(smallNoise) : ''}
 
-        ${choose(hillsWays)}
+        ${withHill ? choose(hillsWays) : ''}
 
         // v = 0.0;
         ${circles.map((c, i) => `
@@ -135,5 +170,5 @@ const hillsWays = [
     `v = csmap(d, 0.0, 0.5, 1.0, v);
      v = csmap(d, 0.0, 0.1, 0.0, v);`,
     `v = csmap(d,0.0,0.5,(sin(d * 3.0 * PI * 2.0) + 1.0) / 3.0,v);`,
-    `v = (sin(d * 5.0 * PI * 2.0) + 1.0) / 4.0;`
+    `v = v / 4.0 + (sin(d * 5.0 * PI * 2.0) + 1.0) / 4.0;`
 ]

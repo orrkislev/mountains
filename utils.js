@@ -1,8 +1,3 @@
-
-const v = (x, y, z) => createVector(x, y, z)
-const p = (x, y) => new paper.Point(x, y)
-const vdist = (a, b) => p5.Vector.dist(a, b)
-
 const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const random = (a = 1, b = 0) => fxrand() * (b - a) + a
